@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRPROTECT | Wallet Sandbox</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#080808;color:#eee;
+ font-family:Arial,sans-serif;
+}
+header{
+ padding:18px 6%;border-bottom:1px solid #222;
+ display:flex;justify-content:space-between;align-items:center;
+}
+.logo{font-size:21px;font-weight:bold;color:#fff}
+a{color:#aaa;text-decoration:none}
+main{max-width:850px;margin:35px auto;padding:0 18px}
+h2{font-size:25px;margin-bottom:5px}
+.sub{color:#888;font-size:13px}
+.card{
+ background:#111;border:1px solid #292929;
+ border-radius:13px;padding:22px;margin-top:18px;
+}
+.balance{
+ font-size:36px;font-weight:bold;margin:12px 0;
+ color:#fff;
+}
+.small{color:#888;font-size:13px}
+.amounts{
+ display:grid;grid-template-columns:repeat(4,1fr);
+ gap:10px;margin-top:16px;
+}
+button{
+ cursor:pointer;border:1px solid #333;
+ background:#1b1b1b;color:white;
+ padding:13px;border-radius:9px;
+ font-size:14px;
+}
+button:hover{background:#292929}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primary{
+ background:#fff;color:#000;border:0;
+ width:100%;margin-top:15px;font-weight:bold;
+}
+.primary:hover{background:#ddd}
+.status{margin-top:12px;color:#bbb;font-size:13px}
+.order{
+ background:#181818;border:1px solid #292929;
+ padding:14px;border-radius:9px;margin-top:12px;
+ overflow-wrap:anywhere;
+}
+.order button{margin-top:12px;width:100%}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+td,th{
+ padding:12px 7px;border-bottom:1px solid #292929;
+ text-align:left;font-size:13px;
+}
+th{color:#888}
+.green{color:#6ee7a0}
+.yellow{color:#f5d477}
+@media(max-width:500px){
+ .amounts{grid-template-columns:repeat(2,1fr)}
+ .balance{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">TRPROTECT</div>
+ <a href="./profile.html">← กลับหน้าโปรไฟล์</a>
+</header>
+
+<main>
+ <h2>กระเป๋าเครดิต</h2>
+ <div class="sub">TRPROTECT Wallet · Sandbox V1</div>
+
+ <section class="card">
+  <div class="small">ยอดเครดิตคงเหลือ</div>
+  <div class="balance"><span id="balance">0</span> CR</div>
+  <div class="small">อัตราทดสอบ 1 บาท = 1 เครดิต</div>
+ </section>
+
+ <section class="card">
+  <h3>เติมเครดิต (Sandbox)</h3>
+  <div class="small">เลือกจำนวนเงินเพื่อสร้างรายการทดสอบ</div>
+
+  <div class="amounts">
+   <button data-amount="10">10 บาท</button>
+   <button data-amount="20">20 บาท</button>
+   <button data-amount="50">50 บาท</button>
+   <button data-amount="100">100 บาท</button>
+  </div>
+
+  <div id="message" class="status">กำลังตรวจสอบบัญชี...</div>
+  <div id="currentOrder"></div>
+ </section>
+
+ <section class="card">
+  <h3>ประวัติรายการเติมเครดิต</h3>
+  <div id="history" class="small">กำลังโหลด...</div>
+ </section>
+</main>
+
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+const balanceEl = document.getElementById("balance");
+const messageEl = document.getElementById("message");
+const historyEl = document.getElementById("history");
+const orderEl = document.getElementById("currentOrder");
+
+let currentUser = null;
+let busy = false;
+
+function message(text){
+ messageEl.textContent = text;
+}
+
+async function init(){
+ const {data,error} = await supabase.auth.getUser();
+
+ if(error || !data.user){
+  location.href = "./login.html";
+  return;
+ }
+
+ currentUser = data.user;
+ message("เข้าสู่ระบบแล้ว");
+ await refresh();
+}
+
+async function refresh(){
+ if(!currentUser) return;
+
+ const {data:wallet,error:walletError} = await supabase
+  .from("sandbox_wallets")
+  .select("balance")
+  .eq("user_id",currentUser.id)
+  .maybeSingle();
+
+ if(walletError){
+  message("โหลด Wallet ไม่สำเร็จ: "+walletError.message);
+  return;
+ }
+
+ balanceEl.textContent = wallet?.balance ?? 0;
+
+ const {data:orders,error:ordersError} = await supabase
+  .from("sandbox_topup_orders")
+  .select("id,amount_baht,credits,status,created_at")
+  .eq("user_id",currentUser.id)
+  .order("created_at",{ascending:false})
+  .limit(10);
+
+ if(ordersError){
+  historyEl.textContent = "โหลดประวัติไม่สำเร็จ: "+ordersError.message;
+  return;
+ }
+
+ if(!orders?.length){
+  historyEl.textContent = "ยังไม่มีประวัติการเติมเครดิต";
+  return;
+ }
+
+ historyEl.innerHTML = `
+  <table>
+   <thead>
+    <tr><th>จำนวน</th><th>สถานะ</th><th>วันที่</th></tr>
+   </thead>
+   <tbody>
+    ${orders.map(o=>`
+     <tr>
+      <td>${o.amount_baht} บาท</td>
+      <td>${escapeHTML(o.status)}</td>
+      <td>${new Date(o.created_at).toLocaleString("th-TH")}</td>
+     </tr>
+    `).join("")}
+   </tbody>
+  </table>
+ `;
+}
+
+function escapeHTML(value){
+ return String(value).replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",
+  '"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+async function createOrder(amount){
+ if(busy) return;
+ busy = true;
+ document.querySelectorAll("[data-amount]").forEach(b=>b.disabled=true);
+
+ try{
+  message("กำลังสร้างรายการ...");
+
+  const {data,error} = await supabase.rpc(
+   "sandbox_create_topup",
+   {p_amount:amount}
+  );
+
+  if(error) throw error;
+
+  const orderId = data;
+  orderEl.innerHTML = `
+   <div class="order">
+    <b>รายการทดสอบสร้างสำเร็จ</b>
+    <p>จำนวน: ${amount} บาท</p>
+    <p>เครดิต: ${amount} CR</p>
+    <p class="small">Order ID:</p>
+    <code>${escapeHTML(orderId)}</code>
+    <button id="simulate" class="primary">
+     จำลองยืนยันการชำระเงิน
+    </button>
+   </div>
+  `;
+
+  document.getElementById("simulate")
+   .addEventListener("click",()=>confirmOrder(orderId));
+
+  message("สร้างรายการแล้ว — ยังไม่มีการชำระเงินจริง");
+  await refresh();
+
+ }catch(error){
+  message("เกิดข้อผิดพลาด: "+error.message);
+ }finally{
+  busy = false;
+  document.querySelectorAll("[data-amount]").forEach(b=>b.disabled=false);
+ }
+}
+
+async function confirmOrder(orderId){
+ if(busy) return;
+ busy = true;
+
+ const btn = document.getElementById("simulate");
+ if(btn) btn.disabled = true;
+
+ try{
+  message("กำลังจำลองยืนยันรายการ...");
+
+  const {data,error} = await supabase.rpc(
+   "sandbox_confirm_payment",
+   {p_order_id:orderId}
+  );
+
+  if(error) throw error;
+
+  const result = Array.isArray(data)?data[0]:data;
+
+  message(
+   result?.order_status==="credited"
+    ? "สำเร็จ! เพิ่มเครดิตใน Sandbox แล้ว"
+    : "สถานะรายการ: "+(result?.order_status ?? "ไม่ทราบ")
+  );
+
+  await refresh();
+
+ }catch(error){
+  message("ยืนยันไม่สำเร็จ: "+error.message);
+  if(btn) btn.disabled = false;
+ }finally{
+  busy = false;
+ }
+}
+
+document.querySelectorAll("[data-amount]").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+  createOrder(Number(btn.dataset.amount));
+ });
+});
+
+init();
+</script>
+</body>
+</html>
