@@ -206,6 +206,23 @@ footer {
   .banner { margin:20px 12px 55px; min-height:170px; }
   .section { padding:0 12px; }
 }
+  #profileIcon {
+  width: 42px;
+  height: 42px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: #252525;
+  border: 1px solid #444;
+  border-radius: 50%;
+  transition: .2s;
+}
+
+#profileIcon:hover {
+  background: #444;
+  transform: scale(1.05);
+}
 </style>
 </head>
 <body>
@@ -304,5 +321,38 @@ footer {
 </section>
 
 <footer>© 2026 TRPROTECT · DIGITAL STORE</footer>
+  
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+async function updateAuthMenu() {
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error("Session error:", error.message);
+    return;
+  }
+
+  const loggedIn = !!data.session;
+
+  const authMenu = document.getElementById("authMenu");
+  const profileIcon = document.getElementById("profileIcon");
+
+  if (!authMenu || !profileIcon) {
+    console.error("ไม่พบ authMenu หรือ profileIcon");
+    return;
+  }
+
+  authMenu.style.display = loggedIn ? "none" : "flex";
+  profileIcon.style.display = loggedIn ? "flex" : "none";
+}
+
+updateAuthMenu();
+
+supabase.auth.onAuthStateChange(() => {
+  updateAuthMenu();
+});
+</script>
+
 </body>
 </html>
