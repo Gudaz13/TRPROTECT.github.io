@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - TRPROTECT</title>
+  <style>
+    body {
+      margin: 0;
+      background: #090909;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 30px 16px;
+    }
+    .profile {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 28px;
+      background: #171717;
+      border: 1px solid #333;
+      border-radius: 16px;
+    }
+    h1 { margin-top: 0; }
+    .item {
+      background: #222;
+      padding: 14px;
+      margin: 12px 0;
+      border-radius: 9px;
+      overflow-wrap: anywhere;
+    }
+    .label { color: #999; font-size: 13px; }
+    .value { margin-top: 7px; }
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: white;
+      color: black;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="profile">
+    <h1>My Profile</h1>
+    <p id="status">กำลังโหลดข้อมูล...</p>
+
+    <div class="item">
+      <div class="label">Display Name</div>
+      <div class="value" id="displayName">-</div>
+    </div>
+
+    <div class="item">
+      <div class="label">Email</div>
+      <div class="value" id="email">-</div>
+    </div>
+
+    <div class="item">
+      <div class="label">User ID</div>
+      <div class="value" id="userId">-</div>
+    </div>
+
+    <div class="item">
+      <div class="label">Role</div>
+      <div class="value" id="role">-</div>
+    </div>
+
+    <button id="logout">ออกจากระบบ</button>
+  </div>
+
+  <script type="module">
+    import { supabase } from "./js/supabase.js";
+
+    const status = document.getElementById("status");
+
+    async function loadProfile() {
+      const { data: authData, error: authError } =
+        await supabase.auth.getUser();
+
+      if (authError || !authData.user) {
+        window.location.href = "./login.html";
+        return;
+      }
+
+      const user = authData.user;
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("id, display_name, role")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        status.textContent =
+          "โหลดโปรไฟล์ไม่สำเร็จ: " + error.message;
+        return;
+      }
+
+      document.getElementById("displayName").textContent =
+        profile.display_name || "ยังไม่ได้ตั้งชื่อ";
+
+      document.getElementById("email").textContent =
+        user.email || "-";
+
+      document.getElementById("userId").textContent =
+        user.id;
+
+      document.getElementById("role").textContent =
+        profile.role || "customer";
+
+      status.textContent = "โหลดโปรไฟล์สำเร็จ";
+    }
+
+    document.getElementById("logout").addEventListener("click",
+      async () => {
+        await supabase.auth.signOut();
+        window.location.href = "./login.html";
+      }
+    );
+
+    loadProfile();
+  </script>
+</body>
+</html>
