@@ -1,10 +1,31 @@
-import { createClient } from
-  "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = "https://hjnsitrswmeydfjlscas.supabase.co";
-const SUPABASE_KEY = "sb_publishable_0Us7sPkIXvLC8Jyyt2x0UA_pVkCPJ35";
+import { supabase } from "./js/supabase.js";
 
-export const supabase = createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+function updateMenu(session) {
+  const loggedIn = !!session;
+
+  const authMenu = document.getElementById("authMenu");
+  const profileIcon = document.getElementById("profileIcon");
+  const heroLogin = document.getElementById("heroLogin");
+
+  authMenu.style.display = loggedIn ? "none" : "flex";
+  profileIcon.style.display = loggedIn ? "flex" : "none";
+  heroLogin.style.display = loggedIn ? "none" : "inline-block";
+}
+
+async function init() {
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error(error.message);
+    return;
+  }
+
+  updateMenu(data.session);
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    updateMenu(session);
+  });
+}
+
+init();
