@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>รายละเอียดสินค้า | TRPROTECT</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#090909;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
+header{
+  padding:18px 7%;
+  background:#111;
+  border-bottom:1px solid #292929;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.logo{font-size:22px;font-weight:bold;letter-spacing:2px}
+.logo span{color:#f4c542}
+a{color:inherit;text-decoration:none}
+.back{color:#aaa;font-size:14px}
+.container{max-width:1100px;margin:35px auto;padding:0 18px}
+.breadcrumb{color:#888;font-size:13px;margin-bottom:25px}
+.product-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:35px;
+}
+.product-image{
+  min-height:350px;
+  background:linear-gradient(145deg,#1c1c1c,#090909);
+  border:1px solid #333;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+}
+.product-image strong{font-size:48px;letter-spacing:5px}
+.product-image span{color:#f4c542}
+.product-info h1{margin:0 0 12px;font-size:30px}
+.description{color:#999;line-height:1.8}
+.price{
+  color:#f4c542;
+  font-size:30px;
+  font-weight:bold;
+  margin:22px 0;
+}
+.section-title{font-weight:bold;margin:22px 0 12px}
+.packages{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.package{
+  padding:15px 8px;
+  background:#151515;
+  border:1px solid #333;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  text-align:center;
+}
+.package.active{
+  border:1px solid #f4c542;
+  background:#29230f;
+}
+.package small{display:block;color:#aaa;margin-top:7px}
+.stock{color:#aaa;font-size:13px;margin-top:15px}
+.buy{
+  width:100%;
+  padding:16px;
+  margin-top:22px;
+  border:0;
+  border-radius:8px;
+  background:#f4c542;
+  color:#111;
+  font-weight:bold;
+  font-size:16px;
+  cursor:not-allowed;
+  opacity:.65;
+}
+.notice{
+  margin-top:15px;
+  padding:14px;
+  background:#191919;
+  border:1px solid #333;
+  border-radius:8px;
+  color:#aaa;
+  font-size:13px;
+  line-height:1.7;
+}
+@media(max-width:700px){
+  .product-layout{grid-template-columns:1fr}
+  .product-image{min-height:250px}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <a class="logo" href="index.html">TR<span>PROTECT</span></a>
+  <a class="back" href="index.html">← กลับหน้าหลัก</a>
+</header>
+
+<main class="container">
+  <div class="breadcrumb">หน้าหลัก / รายละเอียดสินค้า</div>
+
+  <div class="product-layout">
+    <div class="product-image">
+      <div>
+        <strong>TR<span>PROTECT</span></strong>
+        <p style="color:#888">DIGITAL PRODUCT</p>
+      </div>
+    </div>
+
+    <section class="product-info">
+      <h1>TRPROTECT DEMO PRODUCT</h1>
+      <p class="description">
+        สินค้าตัวอย่างสำหรับทดสอบหน้าร้าน
+        และระบบแสดงแพ็กเกจของ TRPROTECT
+      </p>
+
+      <div class="price" id="price">฿5</div>
+
+      <div class="section-title">เลือกแพ็กเกจ</div>
+
+      <div class="packages" id="packages">
+        <button class="package active" data-price="5">
+          1 HR <small>฿5</small>
+        </button>
+        <button class="package" data-price="10">
+          3 HR <small>฿10</small>
+        </button>
+        <button class="package" data-price="15">
+          6 HR <small>฿15</small>
+        </button>
+        <button class="package" data-price="20">
+          12 HR <small>฿20</small>
+        </button>
+        <button class="package" data-price="35">
+          1 DAY <small>฿35</small>
+        </button>
+        <button class="package" data-price="90">
+          3 DAY <small>฿90</small>
+        </button>
+        <button class="package" data-price="140">
+          7 DAY <small>฿140</small>
+        </button>
+        <button class="package" data-price="190">
+          15 DAY <small>฿190</small>
+        </button>
+        <button class="package" data-price="350">
+          30 DAY <small>฿350</small>
+        </button>
+      </div>
+
+      <div class="stock">สถานะ: หน้าทดสอบแพ็กเกจ</div>
+
+      <button class="buy" disabled>
+        ระบบซื้อยังไม่เปิดใช้งาน
+      </button>
+
+      <div class="notice">
+        หน้านี้เป็นหน้าตัวอย่างสำหรับทดสอบ UI เท่านั้น
+        ยังไม่มีการหักเครดิตหรือส่งมอบ Product Key
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const buttons = document.querySelectorAll(".package");
+const price = document.getElementById("price");
+
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    buttons.forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+    price.textContent =
+      "฿" + Number(button.dataset.price).toLocaleString("th-TH");
+  });
+});
+</script>
+</body>
+</html>
