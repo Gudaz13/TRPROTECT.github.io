@@ -2,145 +2,420 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile - TRPROTECT</title>
-  <style>
-    body {
-      margin: 0;
-      background: #090909;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 30px 16px;
-    }
-    .profile {
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 28px;
-      background: #171717;
-      border: 1px solid #333;
-      border-radius: 16px;
-    }
-    h1 { margin-top: 0; }
-    .item {
-      background: #222;
-      padding: 14px;
-      margin: 12px 0;
-      border-radius: 9px;
-      overflow-wrap: anywhere;
-    }
-    .label { color: #999; font-size: 13px; }
-    .value { margin-top: 7px; }
-    button {
-      width: 100%;
-      padding: 13px;
-      margin-top: 12px;
-      border: 0;
-      border-radius: 8px;
-      background: white;
-      color: black;
-      cursor: pointer;
-      font-weight: bold;
-      .back-home {
-  display: inline-block;
-  color: white;
-  background: #292929;
-  border: 1px solid #444;
-  padding: 11px 16px;
-  border-radius: 9px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile | TRPROTECT</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #090909;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+.navbar {
+  height: 70px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111;
+  border-bottom: 1px solid #292929;
+}
+
+.logo {
+  font-size: 21px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.logo span {
+  color: #aaa;
+}
+
+.nav-links {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+a {
+  color: #ccc;
   text-decoration: none;
+}
+
+a:hover {
+  color: white;
+}
+
+.container {
+  width: 90%;
+  max-width: 1050px;
+  margin: 45px auto;
+}
+
+.page-title {
+  margin-bottom: 25px;
+}
+
+.page-title h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+}
+
+.page-title p {
+  color: #888;
+  margin: 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 20px;
+}
+
+.card {
+  background: #141414;
+  border: 1px solid #292929;
+  border-radius: 15px;
+  padding: 24px;
+}
+
+.avatar {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #555, #171717);
+  border: 2px solid #777;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0 auto 15px;
+}
+
+.user-card {
+  text-align: center;
+}
+
+.username {
+  font-size: 20px;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.role {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 13px;
+  border-radius: 20px;
+  background: #292929;
+  color: #ccc;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.menu {
+  margin-top: 25px;
+  border-top: 1px solid #292929;
+  padding-top: 15px;
+  text-align: left;
+}
+
+.menu a, .menu button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 0;
+  color: #ccc;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.menu a:hover, .menu button:hover {
+  background: #252525;
+  color: white;
+}
+
+.section-title {
+  font-size: 18px;
+  margin: 0 0 18px;
+}
+
+.info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.info-box {
+  background: #202020;
+  border-radius: 10px;
+  padding: 15px;
+  min-width: 0;
+}
+
+.info-box small {
+  color: #888;
+  display: block;
+  margin-bottom: 9px;
+}
+
+.info-box strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.stat {
+  background: #202020;
+  padding: 18px;
+  border-radius: 10px;
+}
+
+.stat small {
+  color: #999;
+}
+
+.stat h2 {
+  margin: 10px 0 0;
+  font-size: 21px;
+}
+
+.notice {
+  padding: 14px;
+  background: #202020;
+  border-radius: 10px;
+  color: #999;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.status {
+  color: #aaa;
+  font-size: 13px;
   margin-bottom: 18px;
 }
 
-.back-home:hover {
-  background: #444;
+.error {
+  color: #ff7777;
 }
-    }
-  </style>
+
+@media(max-width: 700px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar {
+    padding: 0 5%;
+  }
+
+  .container {
+    margin-top: 28px;
+  }
+
+  .info {
+    grid-template-columns: 1fr;
+  }
+
+  .full {
+    grid-column: auto;
+  }
+}
+</style>
 </head>
+
 <body>
 
-  <div class="profile">
-    <a class="back-home" href="./index.html">
-  ← กลับหน้าหลัก
-</a>
+<header class="navbar">
+  <div class="logo"><span>TR</span>PROTECT</div>
+
+  <div class="nav-links">
+    <a href="./index.html">หน้าหลัก</a>
+    <a href="./profile.html">โปรไฟล์</a>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-title">
     <h1>My Profile</h1>
-    <p id="status">กำลังโหลดข้อมูล...</p>
-
-    <div class="item">
-      <div class="label">Display Name</div>
-      <div class="value" id="displayName">-</div>
-    </div>
-
-    <div class="item">
-      <div class="label">Email</div>
-      <div class="value" id="email">-</div>
-    </div>
-
-    <div class="item">
-      <div class="label">User ID</div>
-      <div class="value" id="userId">-</div>
-    </div>
-
-    <div class="item">
-      <div class="label">Role</div>
-      <div class="value" id="role">-</div>
-    </div>
-
-    <button id="logout">ออกจากระบบ</button>
+    <p>จัดการข้อมูลบัญชีสมาชิกของคุณ</p>
   </div>
 
-  <script type="module">
-    import { supabase } from "./js/supabase.js";
+  <p class="status" id="status">กำลังโหลดข้อมูลสมาชิก...</p>
 
-    const status = document.getElementById("status");
+  <div class="layout">
 
-    async function loadProfile() {
-      const { data: authData, error: authError } =
-        await supabase.auth.getUser();
+    <aside class="card user-card">
 
-      if (authError || !authData.user) {
-        window.location.href = "./login.html";
-        return;
-      }
+      <div class="avatar" id="avatar">?</div>
 
-      const user = authData.user;
+      <div class="username" id="username">กำลังโหลด...</div>
 
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("id, display_name, role")
-        .eq("id", user.id)
-        .single();
+      <div class="role" id="role">MEMBER</div>
 
-      if (error) {
-        status.textContent =
-          "โหลดโปรไฟล์ไม่สำเร็จ: " + error.message;
-        return;
-      }
+      <div class="menu">
+        <a href="./index.html">⌂ กลับหน้าหลัก</a>
+        <a href="#account">♙ ข้อมูลบัญชี</a>
+        <a href="#orders">▤ ประวัติการซื้อ</a>
+        <button id="logout">↪ ออกจากระบบ</button>
+      </div>
 
-      document.getElementById("displayName").textContent =
-        profile.display_name || "ยังไม่ได้ตั้งชื่อ";
+    </aside>
 
-      document.getElementById("email").textContent =
-        user.email || "-";
+    <section>
 
-      document.getElementById("userId").textContent =
-        user.id;
+      <div class="card" id="account">
+        <h2 class="section-title">ข้อมูลบัญชี</h2>
 
-      document.getElementById("role").textContent =
-        profile.role || "customer";
+        <div class="info">
+          <div class="info-box">
+            <small>ชื่อสมาชิก</small>
+            <strong id="displayName">-</strong>
+          </div>
 
-      status.textContent = "โหลดโปรไฟล์สำเร็จ";
+          <div class="info-box">
+            <small>อีเมล</small>
+            <strong id="email">-</strong>
+          </div>
+
+          <div class="info-box full">
+            <small>User ID</small>
+            <strong id="userId">-</strong>
+          </div>
+
+          <div class="info-box full">
+            <small>ระดับสมาชิก</small>
+            <strong id="memberRole">-</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h2 class="section-title">ข้อมูลสมาชิก</h2>
+
+        <div class="stats">
+          <div class="stat">
+            <small>ยอดเงินคงเหลือ</small>
+            <h2>ยังไม่เปิดใช้งาน</h2>
+          </div>
+
+          <div class="stat">
+            <small>รายการสั่งซื้อ</small>
+            <h2>0</h2>
+          </div>
+        </div>
+
+        <div class="notice">
+          ระบบ Wallet และการสั่งซื้อกำลังอยู่ระหว่างพัฒนา
+          ข้อมูลยอดเงินจะเชื่อมกับฐานข้อมูลจริงในขั้นตอนถัดไป
+        </div>
+      </div>
+
+      <div class="card" id="orders" style="margin-top:20px">
+        <h2 class="section-title">ประวัติการซื้อ</h2>
+
+        <div class="notice">
+          ยังไม่มีข้อมูลประวัติการซื้อ
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+</main>
+
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+const status = document.getElementById("status");
+
+async function loadProfile() {
+  try {
+    const { data: authData, error: authError } =
+      await supabase.auth.getUser();
+
+    if (authError || !authData.user) {
+      window.location.href = "./login.html";
+      return;
     }
 
-    document.getElementById("logout").addEventListener("click",
-      async () => {
-        await supabase.auth.signOut();
-        window.location.href = "./login.html";
-      }
-    );
+    const user = authData.user;
 
-    loadProfile();
-  </script>
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("id, display_name, role")
+      .eq("id", user.id)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    const name =
+      profile.display_name ||
+      user.user_metadata?.display_name ||
+      "สมาชิก TRPROTECT";
+
+    const role = profile.role || "customer";
+
+    document.getElementById("username").textContent = name;
+    document.getElementById("displayName").textContent = name;
+    document.getElementById("email").textContent = user.email || "-";
+    document.getElementById("userId").textContent = user.id;
+
+    document.getElementById("role").textContent =
+      role.toUpperCase();
+
+    document.getElementById("memberRole").textContent =
+      role.toUpperCase();
+
+    document.getElementById("avatar").textContent =
+      name.trim().charAt(0).toUpperCase() || "?";
+
+    status.textContent = "เชื่อมต่อบัญชีสำเร็จ";
+
+  } catch (error) {
+    status.textContent = "โหลดข้อมูลไม่สำเร็จ: " + error.message;
+    status.classList.add("error");
+  }
+}
+
+document.getElementById("logout").addEventListener("click",
+  async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      alert("ออกจากระบบไม่สำเร็จ: " + error.message);
+      return;
+    }
+
+    window.location.href = "./login.html";
+  }
+);
+
+loadProfile();
+</script>
+
 </body>
 </html>
