@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wallet | TRPROTECT</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#090909;color:#fff;
+  font-family:Arial,sans-serif;padding:25px 15px
+}
+.container{max-width:750px;margin:35px auto}
+.card{
+  background:#141414;border:1px solid #292929;
+  border-radius:15px;padding:24px;margin-bottom:18px
+}
+h1{margin-top:0}
+.muted{color:#999;font-size:13px}
+.balance{
+  font-size:42px;font-weight:bold;margin:15px 0;
+  color:#eee
+}
+.buttons{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-top:20px
+}
+button{
+  padding:13px 8px;border:1px solid #444;
+  border-radius:9px;background:#252525;
+  color:white;cursor:pointer;font-weight:bold
+}
+button:hover{background:#444}
+button:disabled{opacity:.5;cursor:not-allowed}
+#message{font-size:13px;margin-top:15px;color:#ccc}
+.item{
+  padding:14px 0;border-bottom:1px solid #292929;
+  display:flex;justify-content:space-between;gap:12px
+}
+.amount{color:#9ee6a8;font-weight:bold}
+a{color:#ccc;text-decoration:none}
+@media(max-width:500px){
+  .buttons{grid-template-columns:repeat(2,1fr)}
+  .balance{font-size:34px}
+}
+</style>
+</head>
+<body>
+
+<main class="container">
+  <p><a href="./profile.html">← กลับหน้าโปรไฟล์</a></p>
+
+  <section class="card">
+    <h1>TRPROTECT WALLET</h1>
+    <p class="muted">กระเป๋าเครดิตสมาชิก</p>
+
+    <p class="muted">ยอดเครดิตคงเหลือ</p>
+    <div class="balance"><span id="balance">0</span> CR</div>
+    <p class="muted" id="email">กำลังตรวจสอบบัญชี...</p>
+  </section>
+
+  <section class="card">
+    <h2>เติมเครดิตทดสอบ</h2>
+    <p class="muted">
+      เลือกจำนวนเครดิตจำลอง ไม่มีการชำระเงินจริง
+    </p>
+
+    <div class="buttons">
+      <button data-amount="10">+10 CR</button>
+      <button data-amount="20">+20 CR</button>
+      <button data-amount="50">+50 CR</button>
+      <button data-amount="100">+100 CR</button>
+    </div>
+
+    <p id="message">กำลังโหลด...</p>
+  </section>
+
+  <section class="card">
+    <h2>ประวัติรายการ</h2>
+    <div id="history" class="muted">กำลังโหลด...</div>
+  </section>
+
+  <p><a href="./index.html">กลับหน้าหลัก</a></p>
+</main>
+
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+const balanceEl = document.getElementById("balance");
+const emailEl = document.getElementById("email");
+const messageEl = document.getElementById("message");
+const historyEl = document.getElementById("history");
+const buttons = [...document.querySelectorAll("[data-amount]")];
+
+let currentUser = null;
+
+async function loadWallet() {
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error || !data.user) {
+    window.location.href = "./login.html";
+    return;
+  }
+
+  currentUser = data.user;
+  emailEl.textContent = currentUser.email || "";
+
+  await refreshWallet();
+}
+
+async function refreshWallet() {
+  const { data: wallet, error: walletError } = await supabase
+    .from("wallets")
+    .select("balance")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (walletError) {
+    messageEl.textContent = "โหลด Wallet ไม่สำเร็จ: " + walletError.message;
+    return;
+  }
+
+  balanceEl.textContent = wallet?.balance ?? 0;
+
+  const { data: transactions, error } = await supabase
+    .from("wallet_transactions")
+    .select("id, amount, transaction_type, created_at")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error) {
+    historyEl.textContent = "โหลดประวัติไม่สำเร็จ";
+    return;
+  }
+
+  historyEl.replaceChildren();
+
+  if (!transactions || transactions.length === 0) {
+    historyEl.textContent = "ยังไม่มีรายการ";
+    return;
+  }
+
+  transactions.forEach((tx) => {
+    const item = document.createElement("div");
+    item.className = "item";
+
+    const left = document.createElement("span");
+    left.textContent = "เติมเครดิตทดสอบ";
+
+    const right = document.createElement("span");
+    right.className = "amount";
+    right.textContent = "+" + tx.amount + " CR";
+
+    item.append(left, right);
+    historyEl.appendChild(item);
+  });
+}
+
+async function topup(amount, button) {
+  if (!currentUser) return;
+
+  buttons.forEach(b => b.disabled = true);
+  messageEl.textContent = "กำลังเติมเครดิตทดสอบ...";
+
+  try {
+    const { data, error } = await supabase.rpc("test_topup", {
+      p_amount: amount,
+      p_request_id: crypto.randomUUID()
+    });
+
+    if (error) throw error;
+
+    const result = data?.[0];
+
+    if (!result) {
+      throw new Error("ไม่ได้รับผลลัพธ์จากระบบ");
+    }
+
+    await refreshWallet();
+
+    messageEl.textContent = result.credited
+      ? "เติมเครดิตสำเร็จ +" + amount + " CR"
+      : "รายการนี้ถูกบันทึกไปแล้ว";
+
+  } catch (error) {
+    messageEl.textContent = "เติมเครดิตไม่สำเร็จ: " + error.message;
+  } finally {
+    buttons.forEach(b => b.disabled = false);
+  }
+}
+
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    topup(Number(button.dataset.amount), button);
+  });
+});
+
+loadWallet();
+</script>
+</body>
+</html>
