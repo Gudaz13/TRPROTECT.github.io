@@ -339,28 +339,9 @@ footer {
 
 <section class="section" id="products">
   <div class="section-heading"><h2>▣ สินค้าทั้งหมด</h2></div>
-  <div class="products">
-    <article class="product">
-      <div class="product-image">TR<br>PRODUCT 01</div>
-      <h3>ตัวอย่างสินค้า 01</h3>
-      <div class="product-info"><span>คงเหลือ —</span><span class="price">฿40</span></div>
-    </article>
-    <article class="product">
-      <div class="product-image">TR<br>PRODUCT 02</div>
-      <h3>ตัวอย่างสินค้า 02</h3>
-      <div class="product-info"><span>คงเหลือ —</span><span class="price">฿30</span></div>
-    </article>
-    <article class="product">
-      <div class="product-image">TR<br>PRODUCT 03</div>
-      <h3>ตัวอย่างสินค้า 03</h3>
-      <div class="product-info"><span>คงเหลือ —</span><span class="price">฿35</span></div>
-    </article>
-    <article class="product">
-      <div class="product-image">TR<br>PRODUCT 04</div>
-      <h3>ตัวอย่างสินค้า 04</h3>
-      <div class="product-info"><span>คงเหลือ —</span><span class="price">฿35</span></div>
-    </article>
-  </div>
+  <div class="products" id="productsGrid">
+  <p style="color:#aaa;">กำลังโหลดสินค้า...</p>
+</div>
 </section>
 
 <footer>© 2026 TRPROTECT · DIGITAL STORE</footer>
@@ -368,38 +349,14 @@ footer {
 <script type="module">
 import { supabase } from "./js/supabase.js";
 
-async function updateAuthMenu() {
-  const { data, error } = await supabase.auth.getSession();
-
-  if (error) {
-    console.error("Session error:", error.message);
-    return;
-  }
-
-  const loggedIn = !!data.session;
-
-  const authMenu = document.getElementById("authMenu");
-  const profileIcon = document.getElementById("profileIcon");
-
-  if (!authMenu || !profileIcon) {
-    console.error("ไม่พบ authMenu หรือ profileIcon");
-    return;
-  }
-
-  authMenu.style.display = loggedIn ? "none" : "flex";
-  profileIcon.style.display = loggedIn ? "flex" : "none";
-}
-
-updateAuthMenu();
-
-supabase.auth.onAuthStateChange(() => {
-  updateAuthMenu();
-});
-  
 async function loadProducts() {
   const grid = document.getElementById("productsGrid");
 
-  grid.innerHTML = '<p style="color:#999">กำลังโหลดสินค้า...</p>';
+  if (!grid) return;
+
+  grid.innerHTML = `
+    <p style="color:#aaa;">กำลังโหลดสินค้า...</p>
+  `;
 
   const { data, error } = await supabase
     .from("products")
@@ -408,50 +365,53 @@ async function loadProducts() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    grid.textContent = "โหลดสินค้าไม่สำเร็จ: " + error.message;
-    console.error(error);
+    console.error("โหลดสินค้าไม่สำเร็จ:", error);
+
+    grid.innerHTML = `
+      <p style="color:#ff5555;">
+        โหลดสินค้าไม่สำเร็จ: ${escapeHTML(error.message)}
+      </p>
+    `;
     return;
   }
 
   if (!data || data.length === 0) {
-    grid.innerHTML =
-      '<p style="color:#999">ยังไม่มีสินค้าเปิดขาย</p>';
+    grid.innerHTML = `
+      <p style="color:#aaa;">ยังไม่มีสินค้าในขณะนี้</p>
+    `;
     return;
   }
 
-  grid.innerHTML = data.map(product => {
-    const name = escapeHTML(product.name);
-    const price = Number(product.price).toLocaleString("th-TH");
-    const stock = Number(product.stock) || 0;
-    const image = product.image_url;
+  grid.innerHTML = data.map(product => `
+    <article class="product">
+      <div class="product-image">
+        ${
+          product.image_url
+            ? `<img src="${escapeHTML(product.image_url)}"
+                 alt="${escapeHTML(product.name)}"
+                 style="width:100%;height:100%;object-fit:cover;">`
+            : "TR<br>PRODUCT"
+        }
+      </div>
 
-    const imageHTML = image
-      ? `<img src="${escapeHTML(image)}"
-           alt="${name}"
-           style="width:100%;height:190px;object-fit:cover;border-radius:11px">`
-      : `<div class="product-image">TR<br>PROTECT</div>`;
+      <h3>${escapeHTML(product.name)}</h3>
 
-    return `
-      <article class="product">
-        ${imageHTML}
-        <h3>${name}</h3>
-        <div class="product-info">
-          <span>${stock > 0 ? "คงเหลือ " + stock : "สินค้าหมด"}</span>
-          <span class="price">฿${price}</span>
-        </div>
-      </article>
-    `;
-  }).join("");
+      <div class="product-info">
+        <span>คงเหลือ ${Number(product.stock)}</span>
+        <span class="price">฿${Number(product.price).toLocaleString("th-TH")}</span>
+      </div>
+    </article>
+  `).join("");
 }
 
 function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
-  }[c]));
+  })[char]);
 }
 
 loadProducts();
