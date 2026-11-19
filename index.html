@@ -395,6 +395,67 @@ updateAuthMenu();
 supabase.auth.onAuthStateChange(() => {
   updateAuthMenu();
 });
+  
+async function loadProducts() {
+  const grid = document.getElementById("productsGrid");
+
+  grid.innerHTML = '<p style="color:#999">กำลังโหลดสินค้า...</p>';
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("id,name,description,price,stock,image_url")
+    .eq("active", true)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    grid.textContent = "โหลดสินค้าไม่สำเร็จ: " + error.message;
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    grid.innerHTML =
+      '<p style="color:#999">ยังไม่มีสินค้าเปิดขาย</p>';
+    return;
+  }
+
+  grid.innerHTML = data.map(product => {
+    const name = escapeHTML(product.name);
+    const price = Number(product.price).toLocaleString("th-TH");
+    const stock = Number(product.stock) || 0;
+    const image = product.image_url;
+
+    const imageHTML = image
+      ? `<img src="${escapeHTML(image)}"
+           alt="${name}"
+           style="width:100%;height:190px;object-fit:cover;border-radius:11px">`
+      : `<div class="product-image">TR<br>PROTECT</div>`;
+
+    return `
+      <article class="product">
+        ${imageHTML}
+        <h3>${name}</h3>
+        <div class="product-info">
+          <span>${stock > 0 ? "คงเหลือ " + stock : "สินค้าหมด"}</span>
+          <span class="price">฿${price}</span>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
+}
+
+loadProducts();
+
 </script>
 
 </body>
