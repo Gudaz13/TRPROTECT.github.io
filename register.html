@@ -3,63 +3,196 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>สมัครสมาชิก | TRPROTECT</title>
+
 <style>
-*{box-sizing:border-box}
-body{
- margin:0;min-height:100vh;display:grid;place-items:center;
- background:#080808;color:white;
- font-family:Arial,sans-serif;padding:20px
+* {
+  box-sizing: border-box;
 }
-.card{
- width:100%;max-width:420px;padding:30px;
- background:#111;border:1px solid #292929;
- border-radius:18px
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #171717 0%, #050505 45%);
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: 45px 20px;
 }
-h1{text-align:center;margin:0 0 8px}
-.sub{text-align:center;color:#999;margin-bottom:28px}
-label{display:block;margin:15px 0 7px;font-size:13px}
-input{
- width:100%;padding:13px;background:#080808;
- border:1px solid #333;border-radius:9px;
- color:white;outline:none
+
+.container {
+  width: 100%;
+  max-width: 440px;
 }
-input:focus{border-color:#aaa}
-button{
- width:100%;padding:14px;margin-top:22px;
- border:0;border-radius:9px;background:#ddd;
- color:#111;font-weight:bold;cursor:pointer
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: bold;
+  margin-bottom: 35px;
 }
-#message{color:#bbb;font-size:13px;text-align:center}
-a{color:#ddd}
-.back{text-align:center;margin-top:20px;font-size:13px}
+
+.brand-icon {
+  color: #999;
+  font-style: italic;
+  font-size: 23px;
+}
+
+h1 {
+  font-size: 34px;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.input-box {
+  position: relative;
+  margin-bottom: 11px;
+}
+
+input {
+  width: 100%;
+  height: 50px;
+  background: #101010;
+  border: 1px solid #303030;
+  border-radius: 14px;
+  padding: 0 16px;
+  color: white;
+  outline: none;
+  font-size: 14px;
+}
+
+input:focus {
+  border-color: #888;
+}
+
+input::placeholder {
+  color: #aaa;
+}
+
+.toggle {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  color: #777;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.login-link {
+  display: block;
+  margin: 17px 0;
+  color: #ddd;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.login-link span {
+  color: white;
+  font-weight: bold;
+}
+
+.message {
+  font-size: 13px;
+  margin: 12px 0;
+  color: #ff7777;
+  overflow-wrap: anywhere;
+}
+
+button {
+  width: 100%;
+  height: 52px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 13px;
+  background: #aaa;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px #ffffff22;
+}
+
+button:hover {
+  background: #ccc;
+  color: #111;
+}
+
+button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.back {
+  display: block;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+  margin-top: 22px;
+  text-decoration: none;
+}
 </style>
 </head>
+
 <body>
-<div class="card">
-<h1>TRPROTECT</h1>
-<p class="sub">สร้างบัญชีสมาชิกใหม่</p>
+<div class="container">
 
-<form id="registerForm">
-<label>ชื่อที่แสดง</label>
-<input id="name" required maxlength="50" placeholder="ชื่อของคุณ">
+  <div class="brand">
+    <span class="brand-icon">TR</span>
+    <span>TRPROTECT</span>
+  </div>
 
-<label>อีเมล</label>
-<input id="email" type="email" required placeholder="example@email.com">
+  <h1>สร้างบัญชีใหม่</h1>
+  <div class="subtitle">สมัครสมาชิกฟรี ใช้เวลาไม่ถึงนาที</div>
 
-<label>รหัสผ่าน</label>
-<input id="password" type="password" minlength="8" required placeholder="อย่างน้อย 8 ตัวอักษร">
+  <form id="registerForm">
 
-<button id="submitBtn" type="submit">สมัครสมาชิก</button>
-</form>
+    <div class="input-box">
+      <input id="username" type="text"
+        placeholder="ชื่อผู้ใช้" required minlength="3">
+    </div>
 
-<p id="message"></p>
-<div class="back">
-มีบัญชีแล้ว? <a href="./login.html">เข้าสู่ระบบ</a>
-<br><br>
-<a href="./index.html">กลับหน้าหลัก</a>
-</div>
+    <div class="input-box">
+      <input id="email" type="email"
+        placeholder="อีเมล" required>
+    </div>
+
+    <div class="input-box">
+      <input id="password" type="password"
+        placeholder="รหัสผ่าน" required minlength="6">
+      <span class="toggle" data-target="password">◉</span>
+    </div>
+
+    <div class="input-box">
+      <input id="confirmPassword" type="password"
+        placeholder="ยืนยันรหัสผ่าน" required minlength="6">
+      <span class="toggle" data-target="confirmPassword">◉</span>
+    </div>
+
+    <a class="login-link" href="./login.html">
+      มีบัญชีอยู่แล้ว? <span>เข้าสู่ระบบ</span>
+    </a>
+
+    <p id="message" class="message"></p>
+
+    <button id="submitBtn" type="submit">
+      สมัครสมาชิก　→
+    </button>
+
+  </form>
+
+  <a class="back" href="./index.html">
+    ← กลับหน้าหลัก
+  </a>
+
 </div>
 
 <script type="module">
@@ -67,42 +200,66 @@ import { supabase } from "./js/supabase.js";
 
 const form = document.getElementById("registerForm");
 const message = document.getElementById("message");
-const button = document.getElementById("submitBtn");
+const submitBtn = document.getElementById("submitBtn");
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+document.querySelectorAll(".toggle").forEach(toggle => {
+  toggle.addEventListener("click", () => {
+    const input = document.getElementById(toggle.dataset.target);
+    input.type = input.type === "password" ? "text" : "password";
+  });
+});
 
-  const name = document.getElementById("name").value.trim();
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById("username").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
+  const confirmPassword =
+    document.getElementById("confirmPassword").value;
 
-  button.disabled = true;
-  message.textContent = "กำลังสมัครสมาชิก...";
+  message.style.color = "#ff7777";
+
+  if (password !== confirmPassword) {
+    message.textContent = "รหัสผ่านไม่ตรงกัน";
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "กำลังสมัครสมาชิก...";
+  message.textContent = "";
 
   try {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { display_name: name },
-        emailRedirectTo: window.location.origin +
-          "/TRPROTECT.github.io/"
+        data: {
+          display_name: username
+        }
       }
     });
 
     if (error) throw error;
 
     if (data.session) {
-      message.textContent = "สมัครสำเร็จ กำลังเข้าสู่เว็บไซต์...";
-      window.location.href = "./index.html";
+      message.style.color = "#75df9b";
+      message.textContent = "สมัครสมาชิกสำเร็จ!";
+
+      setTimeout(() => {
+        window.location.href = "./profile.html";
+      }, 1000);
     } else {
+      message.style.color = "#75df9b";
       message.textContent =
         "สมัครสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี";
-      button.disabled = false;
     }
+
   } catch (error) {
-    message.textContent = "เกิดข้อผิดพลาด: " + error.message;
-    button.disabled = false;
+    message.textContent = error.message;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "สมัครสมาชิก　→";
   }
 });
 </script>
