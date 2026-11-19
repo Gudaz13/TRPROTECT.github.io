@@ -1,0 +1,154 @@
+
+/* TRPROTECT — Black / Blue Liquid Glass shared theme */
+:root{
+  color-scheme:dark;
+  --bg:#050608;
+  --bg2:#080d16;
+  --surface:rgba(16,22,33,.78);
+  --surface-2:rgba(20,30,45,.72);
+  --line:rgba(91,163,255,.20);
+  --line-strong:rgba(83,166,255,.42);
+  --blue:#399dff;
+  --blue-light:#70bdff;
+  --text:#edf4ff;
+  --muted:#91a0b4;
+  --success:#68dfaa;
+  --danger:#ff777f;
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--bg)}
+body{
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(30,112,210,.15),transparent 38%),
+    radial-gradient(ellipse at 92% 18%,rgba(31,89,168,.11),transparent 34%),
+    linear-gradient(180deg,#080d16 0%,#050608 56%,#040507 100%) !important;
+  color:var(--text) !important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif !important;
+}
+a{color:var(--blue-light);transition:color .18s ease,opacity .18s ease}
+a:hover{color:#a5d5ff}
+header,.navbar,.nav-wrap{
+  background:rgba(5,8,14,.78) !important;
+  border-color:var(--line) !important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+.logo,.brand,.brand-icon{color:#f2f7ff !important}
+.card,.product,.order,.order-info,.info-box,.stat,.category,.product-image,
+.notice,.empty,.hero-banner,.package,.input-box{
+  background:linear-gradient(145deg,rgba(21,31,47,.82),rgba(9,14,23,.88)) !important;
+  border:1px solid var(--line) !important;
+  border-radius:var(--radius) !important;
+  box-shadow:0 12px 35px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.035);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.card:hover,.product:hover,.category:hover,.package:hover{
+  border-color:var(--line-strong) !important;
+  box-shadow:0 14px 38px rgba(0,0,0,.3),0 0 22px rgba(48,142,255,.08);
+}
+h1,h2,h3,h4,strong{color:#f3f7ff}
+p,.muted,.small,.sub,.subtitle,.description,.notice{color:var(--muted)}
+input,textarea,select{
+  color:var(--text) !important;
+  background:rgba(4,8,15,.78) !important;
+  border:1px solid rgba(111,151,203,.25) !important;
+  border-radius:13px !important;
+}
+input::placeholder,textarea::placeholder{color:#728198 !important}
+input:focus,textarea:focus,select:focus{
+  outline:none !important;
+  border-color:var(--blue) !important;
+  box-shadow:0 0 0 3px rgba(57,157,255,.13),0 0 20px rgba(57,157,255,.08);
+}
+button,.primary,.buy{
+  color:#f7fbff !important;
+  background:linear-gradient(135deg,#1678d4,#285bb5) !important;
+  border:1px solid rgba(116,190,255,.45) !important;
+  border-radius:13px !important;
+  box-shadow:0 7px 22px rgba(18,104,204,.20),inset 0 1px 0 rgba(255,255,255,.16);
+  transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
+}
+button:hover,.primary:hover,.buy:hover{
+  filter:brightness(1.15);
+  box-shadow:0 9px 27px rgba(29,128,235,.27);
+  transform:translateY(-1px);
+}
+button:disabled{opacity:.48 !important;filter:saturate(.5);cursor:not-allowed}
+.package.active,.category.active,.menu a.active{
+  border-color:var(--blue) !important;
+  background:rgba(34,119,210,.20) !important;
+  box-shadow:0 0 0 1px rgba(57,157,255,.16),0 0 24px rgba(57,157,255,.10);
+}
+.price,.balance,.amount,.role,.status.success,.green{color:var(--blue-light) !important}
+.status.error,.message{color:var(--danger)}
+.status-dot{background:var(--success) !important;box-shadow:0 0 10px rgba(104,223,170,.55)}
+hr{border-color:var(--line)}
+table{border-color:var(--line)}
+td,th{border-bottom-color:var(--line) !important}
+th{color:var(--muted) !important}
+code{color:#a9d7ff;overflow-wrap:anywhere}
+img{max-width:100%}
+.product-image{overflow:hidden}
+#productsGrid,.products{gap:16px}
+#logout,.back{color:var(--muted)}
+::selection{background:rgba(57,157,255,.32);color:white}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto !important;transition:none !important}
+}
+
+/* --- Complete page-level overrides: ensure the old grey/yellow palette is replaced --- */
+:root{
+  --bg:#050608 !important;
+  --panel:#0d1420 !important;
+  --border:rgba(92,163,255,.22) !important;
+  --muted:#91a0b4 !important;
+  --white:#edf4ff !important;
+  --accent:#58aeff !important;
+}
+html,body{background-color:#050608 !important;color:#edf4ff !important}
+body{background-image:radial-gradient(ellipse at 15% 0%,rgba(35,126,230,.18),transparent 38%),radial-gradient(ellipse at 90% 15%,rgba(30,90,180,.13),transparent 35%),linear-gradient(180deg,#080e18 0%,#050608 65%,#030407 100%) !important}
+nav,.navbar,.nav-wrap nav,.nav-wrap,.links,.actions{
+  background:rgba(8,14,24,.82) !important;border-color:rgba(85,157,245,.25) !important;
+  color:#edf4ff !important;backdrop-filter:blur(20px) saturate(140%) !important;
+  -webkit-backdrop-filter:blur(20px) saturate(140%) !important;
+}
+.links a,.nav-btn,.back,.login-link{color:#a9c8ed !important}
+.links a:hover,.nav-links a:hover{background:rgba(49,139,235,.13) !important;color:#fff !important}
+.hero,.section,.container,.content{color:#edf4ff !important}
+.hero h1,.hero h2,.hero h3,.section-heading h2,.category h3,.product h3{color:#f2f7ff !important}
+.hero p,.category p,.subtitle,.sub,.muted,.small,.description,.order-date{color:#91a0b4 !important}
+.banner,.hero-banner{
+  background:radial-gradient(ellipse at 82% 22%,rgba(46,145,255,.28),transparent 34%),linear-gradient(125deg,rgba(17,42,73,.96),rgba(7,13,23,.98) 62%,rgba(12,25,43,.96)) !important;
+  border:1px solid rgba(86,165,255,.32) !important;box-shadow:0 18px 55px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+.card,.stat,.category,.product,.order,.order-info,.info-box,.user-card,.notice,.empty,.input-box,.package,.product-image{
+  background:linear-gradient(145deg,rgba(18,29,46,.88),rgba(7,12,21,.94)) !important;
+  color:#edf4ff !important;border:1px solid rgba(91,163,255,.22) !important;
+  box-shadow:0 14px 38px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.045) !important;
+  backdrop-filter:blur(16px) saturate(130%) !important;-webkit-backdrop-filter:blur(16px) saturate(130%) !important;
+}
+.category,.product,.package,.card,.order{transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease !important}
+.category:hover,.product:hover,.package:hover,.card:hover{
+  border-color:rgba(88,174,255,.55) !important;box-shadow:0 16px 42px rgba(0,0,0,.34),0 0 24px rgba(48,142,255,.11) !important;
+}
+.product-image{background:linear-gradient(145deg,#142943,#080d16) !important;color:#b9d9ff !important}
+.btn,.btn.light,button,.primary,.buy,.toggle{
+  background:linear-gradient(135deg,#1678d4,#2458a8) !important;color:#f7fbff !important;
+  border:1px solid rgba(116,190,255,.48) !important;border-radius:13px !important;
+  box-shadow:0 8px 24px rgba(18,104,204,.22),inset 0 1px 0 rgba(255,255,255,.15) !important;
+}
+.btn:hover,button:hover,.primary:hover,.buy:hover,.toggle:hover{filter:brightness(1.13) !important}
+.price,.balance,.amount,.role,.stock{color:#70bdff !important}
+input,textarea,select{
+  background:rgba(4,9,17,.86) !important;color:#edf4ff !important;
+  border:1px solid rgba(111,164,225,.28) !important;
+}
+input::placeholder,textarea::placeholder{color:#71839c !important}
+input:focus,textarea:focus,select:focus{border-color:#399dff !important;box-shadow:0 0 0 3px rgba(57,157,255,.14) !important}
+hr,.section-heading:after{border-color:rgba(91,163,255,.2) !important;background:rgba(91,163,255,.2) !important}
+table,th,td{border-color:rgba(91,163,255,.2) !important}
+.status,.message{color:#a9c8ed}
+.status.success,.green,.status-dot{color:#68dfaa !important}
+@media(max-width:700px){.banner,.hero-banner{margin-left:14px !important;margin-right:14px !important;padding:22px !important}.products{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}
