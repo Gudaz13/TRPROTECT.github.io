@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRPROTECT | ADMIN</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080808;color:#eee;font-family:Arial,sans-serif}
+header{padding:18px 6%;border-bottom:1px solid #292929;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:bold;font-size:21px}
+a{color:#aaa;text-decoration:none}
+main{max-width:1050px;margin:30px auto;padding:0 18px}
+h2{margin-bottom:5px}
+.muted{color:#888;font-size:13px}
+.card{background:#111;border:1px solid #292929;border-radius:12px;padding:20px;margin-top:18px}
+input,textarea,select{
+ width:100%;background:#080808;color:#fff;border:1px solid #333;
+ padding:12px;border-radius:8px;margin-top:7px;margin-bottom:13px;
+ font-size:14px
+}
+textarea{min-height:110px;resize:vertical}
+label{font-size:13px;color:#bbb}
+button{background:#222;color:white;border:1px solid #444;padding:11px 15px;border-radius:8px;cursor:pointer}
+button:hover{background:#333}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primary{background:#fff;color:#000;border:0;font-weight:bold}
+.primary:hover{background:#ddd}
+.danger{border-color:#743535;color:#ff9999}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.product{border-bottom:1px solid #292929;padding:14px 0}
+.product strong{font-size:16px}
+.product small{display:block;color:#888;margin-top:5px}
+.product button{margin-top:10px;margin-right:6px}
+.status{font-size:13px;color:#bbb;margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.good{color:#75e6a3}
+.bad{color:#ff9999}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+td,th{text-align:left;padding:10px;border-bottom:1px solid #292929;font-size:13px}
+th{color:#888}
+@media(max-width:650px){.grid{grid-template-columns:1fr}header{padding:15px}}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">TRPROTECT <span style="color:#888">ADMIN</span></div>
+ <a href="./profile.html">← กลับโปรไฟล์</a>
+</header>
+
+<main>
+ <h2>จัดการร้านค้า</h2>
+ <div class="muted">ADMIN CONTROL PANEL · SHOP ENGINE V1</div>
+
+ <section class="card">
+  <h3>สถานะผู้ดูแลระบบ</h3>
+  <div id="adminStatus" class="status">กำลังตรวจสอบสิทธิ์...</div>
+ </section>
+
+ <div id="adminPanel" hidden>
+
+  <section class="card">
+   <h3>เพิ่มสินค้าใหม่</h3>
+
+   <label>ชื่อสินค้า</label>
+   <input id="newName" placeholder="เช่น TRPROTECT TEST KEY">
+
+   <label>รายละเอียดสินค้า</label>
+   <textarea id="newDescription" placeholder="รายละเอียดสินค้า"></textarea>
+
+   <label>ราคาเครดิต</label>
+   <input id="newPrice" type="number" min="1" step="1" placeholder="10">
+
+   <label>URL รูปสินค้า (ไม่บังคับ)</label>
+   <input id="newImage" type="url" placeholder="https://example.com/image.png">
+
+   <button class="primary" id="createProduct">+ เพิ่มสินค้า</button>
+   <div id="createMessage" class="status"></div>
+  </section>
+
+  <section class="card">
+   <h3>เติมสต็อก Product Key</h3>
+   <div class="muted">หนึ่งบรรทัดต่อหนึ่ง Key · สูงสุด 500 รายการต่อครั้ง</div>
+
+   <label>เลือกสินค้า</label>
+   <select id="stockProduct">
+    <option value="">กำลังโหลดสินค้า...</option>
+   </select>
+
+   <label>รายการ Product Key</label>
+   <textarea id="stockKeys" placeholder="TRTEST-DEMO-0004-AAAA&#10;TRTEST-DEMO-0005-BBBB&#10;TRTEST-DEMO-0006-CCCC"></textarea>
+
+   <button class="primary" id="addStock">เติมสต็อก</button>
+   <div id="stockMessage" class="status"></div>
+  </section>
+
+  <section class="card">
+   <h3>แก้ไขสินค้า</h3>
+
+   <label>เลือกสินค้า</label>
+   <select id="editProduct">
+    <option value="">เลือกสินค้า</option>
+   </select>
+
+   <label>ชื่อสินค้า</label>
+   <input id="editName">
+
+   <label>รายละเอียด</label>
+   <textarea id="editDescription"></textarea>
+
+   <label>ราคาเครดิต</label>
+   <input id="editPrice" type="number" min="1" step="1">
+
+   <label>URL รูปภาพ</label>
+   <input id="editImage" type="url">
+
+   <label>สถานะสินค้า</label>
+   <select id="editActive">
+    <option value="true">เปิดขาย</option>
+    <option value="false">ปิดขาย</option>
+   </select>
+
+   <button class="primary" id="saveProduct">บันทึกการแก้ไข</button>
+   <div id="editMessage" class="status"></div>
+  </section>
+
+  <section class="card">
+   <h3>สินค้าทั้งหมด</h3>
+   <button id="reload">↻ โหลดข้อมูลใหม่</button>
+   <div id="productList" class="muted" style="margin-top:15px">กำลังโหลด...</div>
+  </section>
+
+ </div>
+</main>
+
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+const $ = id => document.getElementById(id);
+
+let products = [];
+let busy = false;
+
+function show(id,text,ok=false){
+ $(id).textContent = text;
+ $(id).className = "status " + (ok ? "good" : "");
+}
+
+function safe(value){
+ return String(value ?? "").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",
+  '"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+async function checkAdmin(){
+ const {data,error} = await supabase.auth.getUser();
+
+ if(error || !data.user){
+  $("adminStatus").textContent = "กรุณาเข้าสู่ระบบก่อน";
+  location.href = "./login.html";
+  return false;
+ }
+
+ const {data:profile,error:profileError} = await supabase
+  .from("profiles")
+  .select("role,display_name")
+  .eq("id",data.user.id)
+  .maybeSingle();
+
+ if(profileError){
+  $("adminStatus").textContent = "ตรวจสอบสิทธิ์ไม่ได้: "+profileError.message;
+  return false;
+ }
+
+ if(profile?.role !== "admin"){
+  $("adminStatus").textContent = "บัญชีนี้ไม่มีสิทธิ์ ADMIN";
+  return false;
+ }
+
+ $("adminStatus").textContent =
+  "เข้าสู่ระบบในชื่อ "+(profile.display_name || "ADMIN")+" · ADMIN VERIFIED";
+
+ $("adminStatus").className = "status good";
+ $("adminPanel").hidden = false;
+
+ await loadProducts();
+ return true;
+}
+
+async function loadProducts(){
+ const {data,error} = await supabase
+  .from("products")
+  .select("id,name,description,price,stock,image_url,active")
+  .order("created_at",{ascending:false});
+
+ if(error){
+  $("productList").textContent = "โหลดสินค้าไม่สำเร็จ: "+error.message;
+  return;
+ }
+
+ products = data || [];
+
+ const options = products.map(p=>
+  `<option value="${safe(p.id)}">${safe(p.name)} · ${p.stock} ชิ้น</option>`
+ ).join("");
+
+ $("stockProduct").innerHTML =
+  '<option value="">เลือกสินค้า</option>'+options;
+
+ $("editProduct").innerHTML =
+  '<option value="">เลือกสินค้า</option>'+options;
+
+ if(!products.length){
+  $("productList").textContent = "ยังไม่มีสินค้า";
+  return;
+ }
+
+ $("productList").innerHTML = products.map(p=>`
+  <div class="product">
+   <strong>${safe(p.name)}</strong>
+   <small>ราคา ${safe(p.price)} เครดิต · สต็อก ${safe(p.stock)}</small>
+   <small>สถานะ: ${p.active ? "เปิดขาย" : "ปิดขาย"}</small>
+   <small>ID: ${safe(p.id)}</small>
+   <button data-edit="${safe(p.id)}">แก้ไขสินค้านี้</button>
+  </div>
+ `).join("");
+
+ document.querySelectorAll("[data-edit]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+   $("editProduct").value = btn.dataset.edit;
+   fillEditForm();
+   $("editProduct").scrollIntoView({behavior:"smooth"});
+  });
+ });
+}
+
+function fillEditForm(){
+ const p = products.find(x=>x.id === $("editProduct").value);
+ if(!p) return;
+
+ $("editName").value = p.name || "";
+ $("editDescription").value = p.description || "";
+ $("editPrice").value = p.price;
+ $("editImage").value = p.image_url || "";
+ $("editActive").value = String(p.active);
+}
+
+$("editProduct").addEventListener("change",fillEditForm);
+
+$("createProduct").addEventListener("click",async()=>{
+ if(busy) return;
+
+ const name = $("newName").value.trim();
+ const description = $("newDescription").value.trim();
+ const price = Number($("newPrice").value);
+ const image = $("newImage").value.trim() || null;
+
+ if(!name || !Number.isSafeInteger(price) || price <= 0){
+  show("createMessage","กรุณากรอกชื่อและราคาเป็นจำนวนเต็มบวก");
+  return;
+ }
+
+ busy = true;
+ $("createProduct").disabled = true;
+
+ try{
+  const {data,error} = await supabase.rpc(
+   "shop_admin_create_product",
+   {
+    p_name:name,
+    p_description:description,
+    p_price:price,
+    p_category_id:null,
+    p_image_url:image
+   }
+  );
+
+  if(error) throw error;
+
+  show("createMessage","เพิ่มสินค้าเรียบร้อย · ID: "+data,true);
+
+  $("newName").value = "";
+  $("newDescription").value = "";
+  $("newPrice").value = "";
+  $("newImage").value = "";
+
+  await loadProducts();
+ }catch(e){
+  show("createMessage","เกิดข้อผิดพลาด: "+e.message);
+ }finally{
+  busy = false;
+  $("createProduct").disabled = false;
+ }
+});
+
+$("addStock").addEventListener("click",async()=>{
+ if(busy) return;
+
+ const productId = $("stockProduct").value;
+ const keys = $("stockKeys").value
+  .split(/\r?\n/)
+  .map(x=>x.trim())
+  .filter(Boolean);
+
+ if(!productId){
+  show("stockMessage","กรุณาเลือกสินค้า");
+  return;
+ }
+
+ if(!keys.length || keys.length>500){
+  show("stockMessage","กรุณาใส่ Key จำนวน 1–500 รายการ");
+  return;
+ }
+
+ if(new Set(keys).size !== keys.length){
+  show("stockMessage","พบ Key ซ้ำในรายการ กรุณาตรวจสอบ");
+  return;
+ }
+
+ if(!confirm("ยืนยันเติมสต็อก "+keys.length+" รายการ?")) return;
+
+ busy = true;
+ $("addStock").disabled = true;
+
+ try{
+  const {data,error} = await supabase.rpc(
+   "shop_admin_add_stock",
+   {
+    p_product_id:productId,
+    p_keys:keys
+   }
+  );
+
+  if(error) throw error;
+
+  show("stockMessage","เติมสต็อกสำเร็จ "+data+" รายการ",true);
+  $("stockKeys").value = "";
+  await loadProducts();
+ }catch(e){
+  show("stockMessage","เติมสต็อกไม่สำเร็จ: "+e.message);
+ }finally{
+  busy = false;
+  $("addStock").disabled = false;
+ }
+});
+
+$("saveProduct").addEventListener("click",async()=>{
+ if(busy) return;
+
+ const id = $("editProduct").value;
+ const name = $("editName").value.trim();
+ const description = $("editDescription").value.trim();
+ const price = Number($("editPrice").value);
+ const image = $("editImage").value.trim() || null;
+ const active = $("editActive").value === "true";
+
+ if(!id){
+  show("editMessage","กรุณาเลือกสินค้า");
+  return;
+ }
+
+ if(!name || !Number.isSafeInteger(price) || price<=0){
+  show("editMessage","ชื่อสินค้าและราคายังไม่ถูกต้อง");
+  return;
+ }
+
+ busy = true;
+ $("saveProduct").disabled = true;
+
+ try{
+  const {error} = await supabase.rpc(
+   "shop_admin_update_product",
+   {
+    p_product_id:id,
+    p_name:name,
+    p_description:description,
+    p_price:price,
+    p_image_url:image,
+    p_active:active
+   }
+  );
+
+  if(error) throw error;
+
+  show("editMessage","บันทึกสินค้าเรียบร้อย",true);
+  await loadProducts();
+  $("editProduct").value = id;
+  fillEditForm();
+ }catch(e){
+  show("editMessage","บันทึกไม่สำเร็จ: "+e.message);
+ }finally{
+  busy = false;
+  $("saveProduct").disabled = false;
+ }
+});
+
+$("reload").addEventListener("click",loadProducts);
+
+checkAdmin();
+</script>
+</body>
+</html>
