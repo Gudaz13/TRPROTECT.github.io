@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สมัครสมาชิก | TRPROTECT</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;display:grid;place-items:center;
+ background:#080808;color:white;
+ font-family:Arial,sans-serif;padding:20px
+}
+.card{
+ width:100%;max-width:420px;padding:30px;
+ background:#111;border:1px solid #292929;
+ border-radius:18px
+}
+h1{text-align:center;margin:0 0 8px}
+.sub{text-align:center;color:#999;margin-bottom:28px}
+label{display:block;margin:15px 0 7px;font-size:13px}
+input{
+ width:100%;padding:13px;background:#080808;
+ border:1px solid #333;border-radius:9px;
+ color:white;outline:none
+}
+input:focus{border-color:#aaa}
+button{
+ width:100%;padding:14px;margin-top:22px;
+ border:0;border-radius:9px;background:#ddd;
+ color:#111;font-weight:bold;cursor:pointer
+}
+#message{color:#bbb;font-size:13px;text-align:center}
+a{color:#ddd}
+.back{text-align:center;margin-top:20px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>TRPROTECT</h1>
+<p class="sub">สร้างบัญชีสมาชิกใหม่</p>
+
+<form id="registerForm">
+<label>ชื่อที่แสดง</label>
+<input id="name" required maxlength="50" placeholder="ชื่อของคุณ">
+
+<label>อีเมล</label>
+<input id="email" type="email" required placeholder="example@email.com">
+
+<label>รหัสผ่าน</label>
+<input id="password" type="password" minlength="8" required placeholder="อย่างน้อย 8 ตัวอักษร">
+
+<button id="submitBtn" type="submit">สมัครสมาชิก</button>
+</form>
+
+<p id="message"></p>
+<div class="back">
+มีบัญชีแล้ว? <a href="./login.html">เข้าสู่ระบบ</a>
+<br><br>
+<a href="./index.html">กลับหน้าหลัก</a>
+</div>
+</div>
+
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+const form = document.getElementById("registerForm");
+const message = document.getElementById("message");
+const button = document.getElementById("submitBtn");
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  button.disabled = true;
+  message.textContent = "กำลังสมัครสมาชิก...";
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { display_name: name },
+        emailRedirectTo: window.location.origin +
+          "/TRPROTECT.github.io/"
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.session) {
+      message.textContent = "สมัครสำเร็จ กำลังเข้าสู่เว็บไซต์...";
+      window.location.href = "./index.html";
+    } else {
+      message.textContent =
+        "สมัครสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี";
+      button.disabled = false;
+    }
+  } catch (error) {
+    message.textContent = "เกิดข้อผิดพลาด: " + error.message;
+    button.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
