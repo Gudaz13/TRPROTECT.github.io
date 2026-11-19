@@ -223,6 +223,24 @@ footer {
   background: #444;
   transform: scale(1.05);
 }
+  #authMenu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#authMenu a {
+  padding: 10px 13px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  background: #202020;
+  color: white;
+  font-size: 13px;
+}
+
+#authMenu a:hover {
+  background: #444;
+}
 </style>
 </head>
 <body>
@@ -258,7 +276,7 @@ footer {
   <p>TRPROTECT DIGITAL STORE · พร้อมให้บริการ 24 ชม.</p>
   <div class="hero-buttons">
     <a class="btn light" href="#products">ดูสินค้าทั้งหมด →</a>
-    <a class="btn" href="login.html">เข้าสู่ระบบ</a>
+    <a class="btn" id="heroLogin" href="./login.html">   เข้าสู่ระบบ </a>
   </div>
 </header>
 
