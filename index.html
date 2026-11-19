@@ -356,6 +356,47 @@ footer {
 <script type="module">
 import { supabase } from "./js/supabase.js";
 
+// แสดงเมนูตามสถานะการเข้าสู่ระบบที่ Supabase เก็บไว้
+async function updateAuthMenu(session) {
+  const authMenu = document.getElementById("authMenu");
+  const profileIcon = document.getElementById("profileIcon");
+  if (!authMenu) return;
+
+  if (session?.user) {
+    authMenu.innerHTML = `
+      <a href="./profile.html">บัญชีของฉัน</a>
+      <button type="button" id="homeLogout" class="btn">ออกจากระบบ</button>
+    `;
+    if (profileIcon) profileIcon.style.display = "inline-flex";
+
+    document.getElementById("homeLogout")?.addEventListener("click", async () => {
+      const button = document.getElementById("homeLogout");
+      if (button) button.disabled = true;
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        alert("ออกจากระบบไม่สำเร็จ: " + error.message);
+        if (button) button.disabled = false;
+        return;
+      }
+      window.location.reload();
+    });
+  } else {
+    authMenu.innerHTML = `
+      <a href="./login.html">เข้าสู่ระบบ</a>
+      <a href="./register.html">สมัครสมาชิก</a>
+    `;
+    if (profileIcon) profileIcon.style.display = "none";
+  }
+}
+
+// โหลด session ที่บันทึกไว้ และติดตามการเปลี่ยนสถานะ login/logout
+const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+if (sessionError) console.error("ตรวจสอบ session ไม่สำเร็จ:", sessionError);
+await updateAuthMenu(sessionData?.session ?? null);
+supabase.auth.onAuthStateChange((_event, session) => {
+  updateAuthMenu(session);
+});
+
 async function loadProducts() {
   const grid = document.getElementById("productsGrid");
 

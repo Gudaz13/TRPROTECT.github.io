@@ -72,16 +72,6 @@ form.addEventListener("submit", async (event) => {
 
   button.disabled = true;
   message.textContent = "กำลังเข้าสู่ระบบ...";
- console.log("LOGIN BUTTON CLICKED");
-console.log("Email:", email);
-
-const { data, error } = await supabase.auth.signInWithPassword({
-  email,
-  password
-});
-
-console.log("LOGIN RESULT:", data);
-console.log("LOGIN ERROR:", error);
 
   try {
     const { data, error } =
