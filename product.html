@@ -113,7 +113,7 @@ a{color:inherit;text-decoration:none}
   <div class="breadcrumb">หน้าหลัก / รายละเอียดสินค้า</div>
 
   <div class="product-layout">
-    <div class="product-image">
+    <div class="product-image" id="productImage">
       <div>
         <strong>TR<span>PROTECT</span></strong>
         <p style="color:#888">DIGITAL PRODUCT</p>
@@ -121,11 +121,11 @@ a{color:inherit;text-decoration:none}
     </div>
 
     <section class="product-info">
-      <h1>TRPROTECT DEMO PRODUCT</h1>
-      <p class="description">
-        สินค้าตัวอย่างสำหรับทดสอบหน้าร้าน
-        และระบบแสดงแพ็กเกจของ TRPROTECT
-      </p>
+      <h1 id="productName">กำลังโหลดสินค้า...</h1>
+
+<p class="description" id="productDescription">
+  กำลังโหลดรายละเอียด...
+</p>
 
       <div class="price" id="price">฿5</div>
 
@@ -175,18 +175,56 @@ a{color:inherit;text-decoration:none}
   </div>
 </main>
 
-<script>
-const buttons = document.querySelectorAll(".package");
-const price = document.getElementById("price");
+<script type="module">
+import { supabase } from "./js/supabase.js";
 
-buttons.forEach(button => {
-  button.addEventListener("click", () => {
-    buttons.forEach(item => item.classList.remove("active"));
-    button.classList.add("active");
-    price.textContent =
-      "฿" + Number(button.dataset.price).toLocaleString("th-TH");
-  });
-});
+const params = new URLSearchParams(window.location.search);
+const productId = params.get("id");
+
+async function loadProduct() {
+  const name = document.getElementById("productName");
+  const description = document.getElementById("productDescription");
+  const image = document.getElementById("productImage");
+
+  if (!productId) {
+    name.textContent = "ไม่พบรหัสสินค้า";
+    description.textContent = "กรุณากลับไปเลือกสินค้าจากหน้าหลัก";
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("id,name,description,price,stock,image_url")
+    .eq("id", productId)
+    .eq("active", true)
+    .maybeSingle();
+
+  if (error || !data) {
+    name.textContent = "ไม่พบสินค้า";
+    description.textContent = "สินค้านี้อาจถูกปิดใช้งานหรือไม่มีอยู่";
+    return;
+  }
+
+  name.textContent = data.name;
+  description.textContent = data.description || "ไม่มีรายละเอียดสินค้า";
+
+  if (data.image_url) {
+    image.innerHTML = "";
+
+    const img = document.createElement("img");
+    img.src = data.image_url;
+    img.alt = data.name;
+    img.style.cssText = "width:100%;height:100%;object-fit:contain";
+
+    image.appendChild(img);
+  }
+
+  document.getElementById("price").textContent =
+    "฿" + Number(data.price).toLocaleString("th-TH");
+}
+
+loadProduct();
+  
 </script>
 </body>
 </html>
