@@ -383,7 +383,7 @@ async function loadProducts() {
   }
 
   grid.innerHTML = data.map(product => `
-  <a href="product.html" class="product">
+  <a href="product.html?id=${encodeURIComponent(product.id)}" class="product">
       <div class="product-image">
         ${
           product.image_url
