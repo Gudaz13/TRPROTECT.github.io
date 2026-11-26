@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>หมวดหมู่สินค้า | TRPROTECT</title>
+
+<link rel="stylesheet" href="./css/theme.css">
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#07090d;
+  color:#f5f7fb;
+  font-family:Arial,"Noto Sans Thai",sans-serif;
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  padding:17px 5%;
+  background:#0b111beF;
+  border-bottom:1px solid #25364a;
+  backdrop-filter:blur(15px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+.logo span{color:#58aeff}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.back{
+  color:#9ba9bb;
+  font-size:14px;
+}
+
+.container{
+  max-width:1100px;
+  margin:38px auto;
+  padding:0 20px;
+}
+
+.breadcrumb{
+  color:#8995a5;
+  font-size:13px;
+  margin-bottom:25px;
+}
+
+.heading{
+  margin-bottom:28px;
+  padding-bottom:18px;
+  border-bottom:1px solid #263342;
+}
+
+.heading h1{
+  margin:0;
+  font-size:30px;
+}
+
+.heading p{
+  color:#8995a5;
+  font-size:14px;
+  margin:10px 0 0;
+}
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:17px;
+}
+
+.product{
+  display:block;
+  padding:11px;
+  background:linear-gradient(145deg,#111c2b,#0a1019);
+  border:1px solid #253b55;
+  border-radius:15px;
+  transition:.2s;
+}
+
+.product:hover{
+  transform:translateY(-4px);
+  border-color:#399dff;
+  box-shadow:0 10px 30px #0006;
+}
+
+.product-image{
+  height:180px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:linear-gradient(145deg,#172940,#080d15);
+  color:#58aeff;
+  font-size:25px;
+  font-weight:bold;
+}
+
+.product-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.product h3{
+  margin:14px 4px 8px;
+  font-size:15px;
+}
+
+.product-info{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  padding:0 4px 7px;
+  color:#8995a5;
+  font-size:12px;
+}
+
+.price{
+  color:#58aeff;
+  font-weight:bold;
+}
+
+.empty{
+  grid-column:1/-1;
+  padding:45px 20px;
+  text-align:center;
+  background:#101722;
+  border:1px solid #26384d;
+  border-radius:14px;
+  color:#8995a5;
+  line-height:1.8;
+}
+
+footer{
+  margin-top:80px;
+  padding:28px 15px;
+  text-align:center;
+  color:#718096;
+  border-top:1px solid #202b38;
+  font-size:13px;
+}
+
+@media(max-width:800px){
+  .products{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .product-image{height:150px}
+}
+
+@media(max-width:480px){
+  header{padding:15px}
+  .container{padding:0 13px}
+  .heading h1{font-size:25px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    TR<span>PROTECT</span>
+  </a>
+
+  <a href="index.html" class="back">
+    ← กลับหน้าหลัก
+  </a>
+</header>
+
+<main class="container">
+
+  <div class="breadcrumb">
+    หน้าหลัก / หมวดหมู่ / <span id="breadcrumbName">กำลังโหลด...</span>
+  </div>
+
+  <section class="heading">
+    <h1 id="categoryTitle">กำลังโหลดหมวดหมู่...</h1>
+    <p id="categoryDescription">
+      กำลังค้นหาสินค้าในหมวดหมู่นี้
+    </p>
+  </section>
+
+  <section class="products" id="productsGrid">
+    <div class="empty">กำลังโหลดสินค้า...</div>
+  </section>
+
+</main>
+
+<footer>
+  © 2026 TRPROTECT · DIGITAL STORE
+</footer>
+
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+const TEST_PRODUCT_ID =
+  "bf26cdb2-f556-4a7a-89ab-c4705b181775";
+
+const categoryNames = {
+  PC: "สินค้า PC",
+  ANDROID: "สินค้า ANDROID",
+  IOS: "สินค้า IOS",
+  OTHER: "สินค้า OTHER"
+};
+
+const params = new URLSearchParams(location.search);
+const categoryCode = (
+  params.get("category") || ""
+).toUpperCase();
+
+const titleEl = document.getElementById("categoryTitle");
+const breadcrumbEl = document.getElementById("breadcrumbName");
+const descriptionEl = document.getElementById("categoryDescription");
+const grid = document.getElementById("productsGrid");
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
+
+function showEmpty(message){
+  grid.innerHTML = `
+    <div class="empty">
+      ${escapeHTML(message)}
+    </div>
+  `;
+}
+
+async function loadCategory(){
+
+  if(!categoryNames[categoryCode]){
+    titleEl.textContent = "ไม่พบหมวดหมู่";
+    breadcrumbEl.textContent = "ไม่พบหมวดหมู่";
+    showEmpty("กรุณาเลือกหมวดหมู่จากหน้าหลัก");
+    return;
+  }
+
+  titleEl.textContent = categoryNames[categoryCode];
+  breadcrumbEl.textContent = categoryCode;
+
+  descriptionEl.textContent =
+    "สินค้าภายในหมวดหมู่ " + categoryCode;
+
+  // ค้นหาหมวดหมู่จาก Supabase
+  const {data: category, error: categoryError} =
+    await supabase
+      .from("categories")
+      .select("id,name")
+      .ilike("name", categoryCode)
+      .limit(1)
+      .maybeSingle();
+
+  if(categoryError){
+    console.error(categoryError);
+    showEmpty("ไม่สามารถโหลดข้อมูลหมวดหมู่ได้");
+    return;
+  }
+
+  if(!category){
+    showEmpty(
+      "ไม่พบหมวดหมู่ " + categoryCode +
+      " ในฐานข้อมูล กรุณาตรวจสอบตาราง categories"
+    );
+    return;
+  }
+
+  // แสดงเฉพาะสินค้า TEST KEY ในขั้นทดสอบ
+  const {data: products, error: productError} =
+    await supabase
+      .from("products")
+      .select("id,name,description,price,stock,image_url")
+      .eq("category_id", category.id)
+      .eq("id", TEST_PRODUCT_ID)
+      .eq("active", true)
+      .order("created_at", {ascending:false});
+
+  if(productError){
+    console.error(productError);
+    showEmpty("ไม่สามารถโหลดสินค้าได้");
+    return;
+  }
+
+  if(!products || products.length === 0){
+    showEmpty(
+      "ยังไม่มีสินค้าทดสอบในหมวดหมู่ " +
+      categoryCode
+    );
+    return;
+  }
+
+  grid.innerHTML = products.map(product => `
+    <a
+      href="./product.html?id=${encodeURIComponent(product.id)}"
+      class="product"
+    >
+      <div class="product-image">
+        ${
+          product.image_url
+            ? `<img
+                src="${escapeHTML(product.image_url)}"
+                alt="${escapeHTML(product.name)}"
+              >`
+            : "TRPROTECT"
+        }
+      </div>
+
+      <h3>${escapeHTML(product.name)}</h3>
+
+      <div class="product-info">
+        <span>คงเหลือ ${Number(product.stock)} KEY</span>
+
+        <span class="price">
+          ${Number(product.price).toLocaleString("th-TH")} CR
+        </span>
+      </div>
+    </a>
+  `).join("");
+}
+
+loadCategory();
+</script>
+
+</body>
+</html>
