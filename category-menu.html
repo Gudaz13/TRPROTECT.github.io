@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>หมวดหมู่ | TRPROTECT</title>
+
+<link rel="stylesheet" href="./css/theme.css">
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#07090d;
+  color:#f5f7fb;
+  font-family:Arial,"Noto Sans Thai",sans-serif;
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  padding:17px 5%;
+  background:#0b111bee;
+  border-bottom:1px solid #25364a;
+  backdrop-filter:blur(15px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+.logo span{color:#58aeff}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.back{
+  color:#9ba9bb;
+  font-size:14px;
+}
+
+.container{
+  max-width:1100px;
+  margin:40px auto;
+  padding:0 20px;
+}
+
+.breadcrumb{
+  color:#8995a5;
+  font-size:13px;
+  margin-bottom:25px;
+}
+
+.heading{
+  padding-bottom:22px;
+  border-bottom:1px solid #263342;
+  margin-bottom:28px;
+}
+
+.heading h1{
+  margin:0;
+  font-size:32px;
+}
+
+.heading p{
+  color:#8995a5;
+  font-size:14px;
+  margin:10px 0 0;
+}
+
+.category-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+}
+
+.category-card{
+  min-height:130px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:23px;
+  background:linear-gradient(135deg,#142338,#0c121d);
+  border:1px solid #29425e;
+  border-radius:15px;
+  transition:.2s;
+}
+
+.category-card:hover{
+  transform:translateY(-4px);
+  border-color:#399dff;
+  box-shadow:0 10px 30px #0005;
+}
+
+.category-card h2{
+  margin:0;
+  font-size:21px;
+}
+
+.category-card p{
+  color:#8995a5;
+  font-size:13px;
+  margin:9px 0 0;
+}
+
+.arrow{
+  color:#58aeff;
+  font-size:25px;
+}
+
+.notice{
+  margin-top:25px;
+  padding:17px;
+  background:#101722;
+  border:1px solid #25384e;
+  border-radius:12px;
+  color:#8995a5;
+  font-size:13px;
+  line-height:1.8;
+}
+
+.back-parent{
+  display:inline-block;
+  margin-bottom:22px;
+  padding:11px 16px;
+  border:1px solid #315174;
+  border-radius:9px;
+  background:#10243a;
+  color:#58aeff;
+}
+
+.empty{
+  padding:40px 20px;
+  text-align:center;
+  background:#101722;
+  border:1px solid #26384d;
+  border-radius:13px;
+  color:#8995a5;
+}
+
+footer{
+  margin-top:80px;
+  padding:28px;
+  text-align:center;
+  border-top:1px solid #202b38;
+  color:#718096;
+  font-size:13px;
+}
+
+@media(max-width:600px){
+  header{padding:15px}
+  .container{padding:0 14px}
+  .heading h1{font-size:26px}
+  .category-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    TR<span>PROTECT</span>
+  </a>
+
+  <a href="index.html" class="back">
+    ← หน้าหลัก
+  </a>
+</header>
+
+<main class="container">
+
+  <div class="breadcrumb" id="breadcrumb">
+    หน้าหลัก / หมวดหมู่
+  </div>
+
+  <section class="heading">
+    <h1 id="pageTitle">กำลังโหลด...</h1>
+    <p id="pageDescription">
+      กำลังโหลดข้อมูลหมวดหมู่
+    </p>
+  </section>
+
+  <a
+    id="backParent"
+    class="back-parent"
+    href="#"
+    hidden
+  >
+    ← กลับหมวดหมู่หลัก
+  </a>
+
+  <section class="category-grid" id="categoryGrid">
+    <div class="empty">กำลังโหลดหมวดหมู่...</div>
+  </section>
+
+  <div class="notice" id="notice" hidden>
+    หน้านี้เป็นส่วนทดสอบระบบนำทางหมวดหมู่
+  </div>
+
+</main>
+
+<footer>
+  © 2026 TRPROTECT · DIGITAL STORE
+</footer>
+
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+const grid = document.getElementById("categoryGrid");
+const title = document.getElementById("pageTitle");
+const description = document.getElementById("pageDescription");
+const breadcrumb = document.getElementById("breadcrumb");
+const backParent = document.getElementById("backParent");
+const notice = document.getElementById("notice");
+
+const params = new URLSearchParams(location.search);
+const selectedSlug = params.get("category");
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
+
+function showEmpty(message){
+  grid.innerHTML = `
+    <div class="empty">
+      ${escapeHTML(message)}
+    </div>
+  `;
+}
+
+function renderCards(items){
+  if(!items.length){
+    showEmpty("ยังไม่มีหมวดย่อย");
+    return;
+  }
+
+  grid.innerHTML = items.map(item => `
+    <a
+      class="category-card"
+      href="./category-menu.html?category=${encodeURIComponent(item.slug)}"
+    >
+      <div>
+        <h2>${escapeHTML(item.name)}</h2>
+        <p>ดูหมวดหมู่นี้</p>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+  `).join("");
+}
+
+async function loadCategories(){
+
+  const {data:categories, error} = await supabase
+    .from("category_navigation")
+    .select("id,slug,name,parent_id,sort_order")
+    .eq("is_active", true)
+    .order("sort_order", {ascending:true});
+
+  if(error){
+    console.error(error);
+    title.textContent = "โหลดหมวดหมู่ไม่สำเร็จ";
+    showEmpty("ตรวจสอบตาราง category_navigation และสิทธิ์ Supabase");
+    return;
+  }
+
+  if(!categories || categories.length === 0){
+    title.textContent = "ไม่มีหมวดหมู่";
+    showEmpty("ยังไม่มีข้อมูลหมวดหมู่");
+    return;
+  }
+
+  const selected = categories.find(
+    item => item.slug === selectedSlug
+  );
+
+  if(!selected){
+    title.textContent = "ไม่พบหมวดหมู่";
+    description.textContent = "กรุณาเลือกหมวดหมู่จากหน้าหลัก";
+    showEmpty("ไม่พบหมวดหมู่ที่ต้องการ");
+    return;
+  }
+
+  const children = categories.filter(
+    item => item.parent_id === selected.id
+  );
+
+  title.textContent = selected.name;
+  breadcrumb.textContent = "หน้าหลัก / " + selected.name;
+
+  if(selected.parent_id){
+
+    const parent = categories.find(
+      item => item.id === selected.parent_id
+    );
+
+    if(parent){
+      breadcrumb.textContent =
+        "หน้าหลัก / " + parent.name + " / " + selected.name;
+
+      backParent.href =
+        "./category-menu.html?category=" +
+        encodeURIComponent(parent.slug);
+
+      backParent.hidden = false;
+    }
+
+    description.textContent =
+      "คุณอยู่ในหมวดย่อย " + selected.name;
+
+    showEmpty(
+      "นี่คือหน้าหมวดย่อย " + selected.name +
+      " สำหรับทดสอบระบบนำทาง"
+    );
+
+    notice.hidden = false;
+    return;
+  }
+
+  description.textContent =
+    "เลือกหมวดย่อยที่ต้องการ";
+
+  if(children.length === 0){
+    showEmpty("หมวดหมู่นี้ยังไม่มีหมวดย่อย");
+    return;
+  }
+
+  renderCards(children);
+}
+
+loadCategories();
+</script>
+
+</body>
+</html>
